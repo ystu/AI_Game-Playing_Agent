@@ -213,7 +213,13 @@ class MinimaxPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         # TODO: finish this function!
-        raise NotImplementedError
+        best_score = float('-inf')
+        best_move = None
+
+        #for m in game.get_legal_moves():
+
+    def terminal_test(game):
+
 
 
 class AlphaBetaPlayer(IsolationPlayer):
