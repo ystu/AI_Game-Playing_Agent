@@ -216,11 +216,13 @@ class MinimaxPlayer(IsolationPlayer):
         best_score = float('-inf')
         best_move = None
 
+        return game.get_legal_moves()
+
         #for m in game.get_legal_moves():
 
     # def terminal_test(game):
         # return true if the game is over for the active player and false otherwise
-        # game.
+        # game.get
 
 
 class AlphaBetaPlayer(IsolationPlayer):
