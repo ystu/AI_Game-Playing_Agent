@@ -218,8 +218,9 @@ class MinimaxPlayer(IsolationPlayer):
 
         #for m in game.get_legal_moves():
 
-    def terminal_test(game):
-
+    # def terminal_test(game):
+        # return true if the game is over for the active player and false otherwise
+        # game.
 
 
 class AlphaBetaPlayer(IsolationPlayer):
