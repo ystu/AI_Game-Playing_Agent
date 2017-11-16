@@ -10,32 +10,7 @@ class SearchTimeout(Exception):
     pass
 
 
-def custom_score(game, player):
-    """Calculate the heuristic value of a game state from the point of view
-    of the given player.
 
-    This should be the best heuristic function for your project submission.
-
-    Note: this function should be called from within a Player instance as
-    `self.score()` -- you should not need to call this function directly.
-
-    Parameters
-    ----------
-    game : `isolation.Board`
-        An instance of `isolation.Board` encoding the current state of the
-        game (e.g., player locations and blocked cells).
-
-    player : object
-        A player instance in the current game (i.e., an object corresponding to
-        one of the player objects `game.__player_1__` or `game.__player_2__`.)
-
-    Returns
-    -------
-    float
-        The heuristic value of the current game state to the specified player.
-    """
-    # TODO: finish this function!
-    raise NotImplementedError
 
 
 def custom_score_2(game, player):
@@ -88,6 +63,39 @@ def custom_score_3(game, player):
     """
     # TODO: finish this function!
     raise NotImplementedError
+
+def custom_score(game, player):
+    """Calculate the heuristic value of a game state from the point of view
+    of the given player.
+
+    This should be the best heuristic function for your project submission.
+
+    Note: this function should be called from within a Player instance as
+    `self.score()` -- you should not need to call this function directly.
+
+    Parameters
+    ----------
+    game : `isolation.Board`
+        An instance of `isolation.Board` encoding the current state of the
+        game (e.g., player locations and blocked cells).
+
+    player : object
+        A player instance in the current game (i.e., an object corresponding to
+        one of the player objects `game.__player_1__` or `game.__player_2__`.)
+
+    Returns
+    -------
+    float
+        The heuristic value of the current game state to the specified player.
+    """
+    # TODO: finish this function!
+    '''open move score'''
+    if game.is_loser(player):
+        return float('-inf')
+    if game.is_winner(player):
+        return float('inf')
+
+    return float(len(game.get_legal_moves(player)))
 
 
 class IsolationPlayer:
@@ -216,13 +224,38 @@ class MinimaxPlayer(IsolationPlayer):
         best_score = float('-inf')
         best_move = None
 
-        return game.get_legal_moves()
+        current_depth = 0
+        for m in game.get_legal_moves():
+            v = self.min_value(game.forecast_move(m), depth)
+            if v > best_score:
+                best_score = v
+                best_move = m
+        return best_move
 
-        #for m in game.get_legal_moves():
 
-    # def terminal_test(game):
-        # return true if the game is over for the active player and false otherwise
-        # game.get
+    def terminal_test(self, game, current_depth):
+        ''' return true if the game is over for the active player and false otherwise
+            or current depth is larger than search depth '''
+        return (not bool(game.get_legal_moves())) or (current_depth > self.search_depth)
+
+    def min_value(self, game, depth):
+        depth += 1
+        if self.terminal_test(game, depth):
+            return self.score(game, game.inactive_player)
+        v = float('inf')
+        for m in game.get_legal_moves():
+            v = min(v, self.max_value(game.forecast_move(m), depth))
+        return v
+
+    def max_value(self, game, depth):
+        depth += 1
+        if self.terminal_test(game, depth):
+            return self.score(game, game.inactive_player)
+        v = float('-inf')
+        for m in game.get_legal_moves():
+            v = max(v, self.min_value(game.forecast_move(m), depth))
+        return v
+
 
 
 class AlphaBetaPlayer(IsolationPlayer):

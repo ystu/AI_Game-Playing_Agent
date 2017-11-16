@@ -20,6 +20,17 @@ class IsolationTest(unittest.TestCase):
         self.player2 = "Player2"
         self.game = isolation.Board(self.player1, self.player2)
 
+    def test1(self):
+        a = 2
+        b = 1
+        # self.assertTrue(a == b, "ffalse")
+        print('a = ', a)
+        print(self.game.get_legal_moves(self.player1))
+
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
