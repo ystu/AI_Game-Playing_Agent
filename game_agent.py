@@ -226,7 +226,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         current_depth = 0
         for m in game.get_legal_moves():
-            v = self.min_value(game.forecast_move(m), depth)
+            v = self.min_value(game.forecast_move(m), current_depth)
             if v > best_score:
                 best_score = v
                 best_move = m
