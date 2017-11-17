@@ -233,6 +233,7 @@ class MinimaxPlayer(IsolationPlayer):
         return best_move
 
 
+
     def terminal_test(self, game, current_depth):
         ''' return true if the game is over for the active player and false otherwise
             or current depth is larger than search depth '''
