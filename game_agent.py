@@ -10,76 +10,6 @@ class SearchTimeout(Exception):
     pass
 
 
-def custom_score_2(game, player):
-    """Calculate the heuristic value of a game state from the point of view
-    of the given player.
-
-    Note: this function should be called from within a Player instance as
-    `self.score()` -- you should not need to call this function directly.
-
-    Parameters
-    ----------
-    game : `isolation.Board`
-        An instance of `isolation.Board` encoding the current state of the
-        game (e.g., player locations and blocked cells).
-
-    player : object
-        A player instance in the current game (i.e., an object corresponding to
-        one of the player objects `game.__player_1__` or `game.__player_2__`.)
-
-    Returns
-    -------
-    float
-        The heuristic value of the current game state to the specified player.
-    """
-    # TODO: finish this function!
-    ''' center score '''
-    if game.is_loser(player):
-        return float("-inf")
-
-    if game.is_winner(player):
-        return float("inf")
-
-    w, h = game.width / 2., game.height / 2.
-    y, x = game.get_player_location(player)
-    return float((h - y)**2 + (w - x)**2)
-
-
-def custom_score_3(game, player):
-    """Calculate the heuristic value of a game state from the point of view
-    of the given player.
-
-    Note: this function should be called from within a Player instance as
-    `self.score()` -- you should not need to call this function directly.
-
-    Parameters
-    ----------
-    game : `isolation.Board`
-        An instance of `isolation.Board` encoding the current state of the
-        game (e.g., player locations and blocked cells).
-
-    player : object
-        A player instance in the current game (i.e., an object corresponding to
-        one of the player objects `game.__player_1__` or `game.__player_2__`.)
-
-    Returns
-    -------
-    float
-        The heuristic value of the current game state to the specified player.
-    """
-    # TODO: finish this function!
-    ''' improved score '''
-    if game.is_loser(player):
-        return float("-inf")
-
-    if game.is_winner(player):
-        return float("inf")
-
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves - opp_moves)
-
-
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
     of the given player.
@@ -105,13 +35,111 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    ''' open move score '''
+    ''' improved socre  + attack moves'''
     if game.is_loser(player):
         return float('-inf')
     if game.is_winner(player):
         return float('inf')
 
-    return float(len(game.get_legal_moves(player)))
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float(own_moves - opp_moves) + attack_moves(game, player)
+
+
+def custom_score_2(game, player):
+    """Calculate the heuristic value of a game state from the point of view
+    of the given player.
+
+    Note: this function should be called from within a Player instance as
+    `self.score()` -- you should not need to call this function directly.
+
+    Parameters
+    ----------
+    game : `isolation.Board`
+        An instance of `isolation.Board` encoding the current state of the
+        game (e.g., player locations and blocked cells).
+
+    player : object
+        A player instance in the current game (i.e., an object corresponding to
+        one of the player objects `game.__player_1__` or `game.__player_2__`.)
+
+    Returns
+    -------
+    float
+        The heuristic value of the current game state to the specified player.
+    """
+    # TODO: finish this function!
+    ''' improved score and double oppo's weight'''
+    if game.is_loser(player):
+        return float('-inf')
+    if game.is_winner(player):
+        return float('inf')
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float(own_moves - 2 * opp_moves)
+
+
+def custom_score_3(game, player):
+    """Calculate the heuristic value of a game state from the point of view
+    of the given player.
+
+    Note: this function should be called from within a Player instance as
+    `self.score()` -- you should not need to call this function directly.
+
+    Parameters
+    ----------
+    game : `isolation.Board`
+        An instance of `isolation.Board` encoding the current state of the
+        game (e.g., player locations and blocked cells).
+
+    player : object
+        A player instance in the current game (i.e., an object corresponding to
+        one of the player objects `game.__player_1__` or `game.__player_2__`.)
+
+    Returns
+    -------
+    float
+        The heuristic value of the current game state to the specified player.
+    """
+    # TODO: finish this function!
+    ''' improved score + central score'''
+    if game.is_loser(player):
+        return float('-inf')
+    if game.is_winner(player):
+        return float('inf')
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float(own_moves - opp_moves) - central_distance(game, game.get_player_location(player))
+
+
+def central_distance(game, move):
+    ''' calculate the distance from central point '''
+    y, x = move
+    w, h = game.width / 2., game.height / 2.
+
+    return float((h - y) ** 2 + (w - x) ** 2)
+
+
+def common_moves(game, player):
+    ''' get the common moves between opponent and I '''
+    my_moves = game.get_legal_moves()
+    oppo = game.get_opponent(player)
+    oppo_moves = game.get_legal_moves(oppo)
+
+    return my_moves and oppo_moves
+
+
+def attack_moves(game, player):
+    ''' try to let the opponent stay away from central position '''
+    cmoves = common_moves(game, player)
+    if not cmoves:
+        return 0
+    return max(central_distance(game, m) for m in cmoves)
 
 
 class IsolationPlayer:
@@ -137,7 +165,7 @@ class IsolationPlayer:
         timer expires.
     """
 
-    def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
+    def __init__(self, search_depth=3, score_fn=custom_score_2, timeout=10.):
         self.search_depth = search_depth
         self.score = score_fn
         self.time_left = None
@@ -334,7 +362,6 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         return best_move
 
-
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
         described in the lectures.
@@ -435,4 +462,3 @@ class AlphaBetaPlayer(IsolationPlayer):
                 return v
             beta = min(beta, v)
         return v
-
