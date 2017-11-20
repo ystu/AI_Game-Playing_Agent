@@ -44,7 +44,7 @@ def custom_score(game, player):
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
 
-    return float(own_moves - opp_moves) + attack_moves(game, player)
+    return float(own_moves - opp_moves) - attack_moves(game, player)
 
 
 def custom_score_2(game, player):
